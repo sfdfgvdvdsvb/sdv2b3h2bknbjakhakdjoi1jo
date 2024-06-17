@@ -14,10 +14,10 @@ local Storage = {
 
 local DementiaEnjoyer = {
 
-    Box = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
-    Tracers = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
-    HealthBar = {Enabled = true, DynamicColor = true, Colors = {Healthy = Color3.fromRGB(0, 255, 0), Well = Color3.fromRGB(255, 255, 0), UnWell = Color3.fromRGB(255, 0, 0)}},
-    Flags = {Enabled = true, Distance = true, Health = true, Color = Color3.fromRGB(255, 255, 255), Font = 2},
+    Box = {Enabled = false, Color = Color3.fromRGB(255, 255, 255)},
+    Tracers = {Enabled = false, Color = Color3.fromRGB(255, 255, 255)},
+    HealthBar = {Enabled = false, DynamicColor = true, Colors = {Healthy = Color3.fromRGB(0, 255, 0), Well = Color3.fromRGB(255, 255, 0), UnWell = Color3.fromRGB(255, 0, 0)}},
+    Flags = {Enabled = false, Distance = true, Health = true, Color = Color3.fromRGB(255, 255, 255), Font = 2},
 
     Settings = {
         TeamCheck = false,
