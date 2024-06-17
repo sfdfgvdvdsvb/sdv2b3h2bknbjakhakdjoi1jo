@@ -1,0 +1,173 @@
+--// Made by @dementia enjoyer --\\ 
+--// This was made for Solara, therefor the esp has no outlines since Solara's drawing lib is ass...
+--// If you for some reason want to use this then give me credits, thanks --\\
+
+local PlayerFolder = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local Camera = workspace.CurrentCamera
+
+local Storage = {
+    ESPFunctions = {},
+    Math = {},
+    ESPObjects = {},
+}
+
+local DementiaEnjoyer = {
+
+    Box = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
+    Tracers = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
+    HealthBar = {Enabled = true, DynamicColor = true, Colors = {Healthy = Color3.fromRGB(0, 255, 0), Well = Color3.fromRGB(255, 255, 0), UnWell = Color3.fromRGB(255, 0, 0)}},
+    Flags = {Enabled = true, Distance = true, Health = true, Color = Color3.fromRGB(255, 255, 255), Font = 2},
+
+    Settings = {
+        TeamCheck = false,
+        RenderSelf = false,
+        Storage = {
+            Loaded = getgenv().Loaded,
+        }
+    }
+}
+
+do --// Functions
+    
+    function Storage.ESPFunctions:CreateESP(Player)
+
+        if not Storage.ESPObjects[Player] then
+
+            local Box = Drawing.new("Square")
+            Box.Transparency = 1
+            Box.Color = Color3.fromRGB(255, 255, 255)
+            Box.Visible = true
+
+            local Tracer = Drawing.new("Line")
+            Tracer.Transparency = 1
+            Tracer.Color = Color3.fromRGB(255, 255, 255)
+            Tracer.Visible = true
+
+            local HealthBar = Drawing.new("Square")
+            HealthBar.Transparency = 1
+            HealthBar.Color = Color3.fromRGB(0, 255, 0)
+            HealthBar.Visible = true
+            HealthBar.Filled = true
+
+            local Flags = Drawing.new("Text")
+            Flags.Transparency = 1
+            Flags.Font = 2
+            Flags.Center = true
+            Flags.Color = Color3.fromRGB(255, 255, 255)
+
+            Storage.ESPObjects[Player] = {Box = Box, Tracer = Tracer, Healthbar = HealthBar, Flags = Flags}
+
+        end
+    end
+
+    function Storage.ESPFunctions:ClearESP(Player)
+        if Storage.ESPObjects[Player] then
+            local ESPs = Storage.ESPObjects[Player]
+            for i, EspObject in ESPs do
+                EspObject:Remove()
+            end
+            Storage.ESPObjects[Player] = nil
+        end
+    end
+
+    function Storage.Math:GetDistance(Origin, End)
+        return (Origin - End).Magnitude
+    end
+    
+end
+
+task.spawn(function()
+
+    if DementiaEnjoyer.Settings.Loaded then
+        return
+    end
+
+    while task.wait() do
+
+        for i, player in PlayerFolder:GetPlayers() do
+            if player ~= PlayerFolder.LocalPlayer then
+                Storage.ESPFunctions:CreateESP(player)
+            end
+        end
+
+        for player, ESPs in Storage.ESPObjects do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") and not DementiaEnjoyer.Settings.TeamCheck or (DementiaEnjoyer.Settings.TeamCheck and player.Team ~= PlayerFolder.LocalPlayer.Team) then
+        
+                local MeasuredDistance = Storage.Math:GetDistance(Camera.CFrame.Position, player.Character.HumanoidRootPart.Position)
+                local Root, OnScreen = Camera:WorldToViewportPoint(player.Character.HumanoidRootPart.Position)
+                local Scale = 1000 / MeasuredDistance * 80 / Camera.FieldOfView
+        
+                if OnScreen then
+        
+                    local Box = ESPs.Box
+                    local Tracer = ESPs.Tracer
+                    local HealthBar = ESPs.Healthbar
+                    local Flags = ESPs.Flags
+        
+                    do --// Box
+                        Box.Size = Vector2.new(3 * Scale, 4 * Scale)
+                        Box.Position = Vector2.new(Root.X - Box.Size.X / 2, Root.Y - Box.Size.Y / 2)
+                        Box.Visible = DementiaEnjoyer.Box.Enabled
+                        Box.Color = DementiaEnjoyer.Box.Color
+                    end
+        
+                    do --// Tracers
+                        Tracer.From = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+                        Tracer.To = Vector2.new(Box.Position.X + (Box.Size.X / 2), Box.Position.Y + (Box.Size.Y))
+                        Tracer.Visible = DementiaEnjoyer.Tracers.Enabled
+                        Tracer.Color = DementiaEnjoyer.Tracers.Color
+                    end
+        
+                    do --// Healthbar        
+                        local Health = player.Character.Humanoid.Health
+                        HealthBar.Size = Vector2.new(2, Box.Size.Y * Health / player.Character.Humanoid.MaxHealth)
+                        HealthBar.Position = Vector2.new(Box.Position.X - 5, Box.Position.Y + (Box.Size.Y * (1 - Health / player.Character.Humanoid.MaxHealth)))
+                        HealthBar.Visible = DementiaEnjoyer.HealthBar.Enabled
+                        if DementiaEnjoyer.HealthBar.DynamicColor then
+                            if Health < 30 then
+                                HealthBar.Color = DementiaEnjoyer.HealthBar.Colors.UnWell
+                            elseif Health < 70 then
+                                HealthBar.Color = DementiaEnjoyer.HealthBar.Colors.Well
+                            else
+                                HealthBar.Color = DementiaEnjoyer.HealthBar.Colors.Healthy
+                            end
+                        else
+                            HealthBar.Color = DementiaEnjoyer.HealthBar.Colors.Healthy
+                        end
+                    end
+        
+                    do --// Flags
+
+                        local Text = ""
+
+                        if DementiaEnjoyer.Flags.Distance then
+                            Text = Text .. "[ " .. math.floor(MeasuredDistance * 0.25) .. "m ]" --// original format is studs, but if we x that by 0.25 it becomes meters
+                        end
+                        if DementiaEnjoyer.Flags.Health then
+                            Text = Text .. " - [ " .. player.Character.Humanoid.Health .. "%" .. " ]"
+                        end
+    
+                        Flags.Text = Text
+                        Flags.Position = Vector2.new(Box.Position.X + Box.Size.X / 2, Box.Position.Y + Box.Size.Y)
+                        Flags.Size = math.clamp(1 / MeasuredDistance * 1000, 10, 30)
+                        Flags.Visible = DementiaEnjoyer.Flags.Enabled
+                        Flags.Color = DementiaEnjoyer.Flags.Color
+                        Flags.Font = DementiaEnjoyer.Flags.Font
+
+                    end
+        
+                else
+                    Storage.ESPFunctions:ClearESP(player)
+                end
+        
+            else
+                Storage.ESPFunctions:ClearESP(player)
+            end
+        end
+        
+    end
+end)
+DementiaEnjoyer.Settings.Loaded = true
+
+return DementiaEnjoyer
