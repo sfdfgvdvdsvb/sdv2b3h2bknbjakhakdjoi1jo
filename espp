@@ -17,6 +17,7 @@ local DementiaEnjoyer = {
     Box = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
     Tracers = {Enabled = true, Color = Color3.fromRGB(255, 255, 255)},
     HealthBar = {Enabled = true, DynamicColor = true, Colors = {Healthy = Color3.fromRGB(0, 255, 0), Well = Color3.fromRGB(255, 255, 0), UnWell = Color3.fromRGB(255, 0, 0)}},
+    Chams = {Enabled = false, FillColor = Color3.fromRGB(255, 255, 255), OutlineColor = Color3.fromRGB(255, 255, 255), VisibleOnly = false, FillTransparency = 0, OutlineTransparency = 0},
     Flags = {Enabled = true, Distance = true, Health = true, Color = Color3.fromRGB(255, 255, 255), Font = 2},
 
     Settings = {
@@ -43,11 +44,6 @@ do --// Functions
             Tracer.Transparency = 1
             Tracer.Color = Color3.fromRGB(255, 255, 255)
             Tracer.Visible = true
-
-            local Chams = Drawing.new("Line")
-            Chams.Transparency = 1
-            Chams.Color = Color3.fromRGB(255, 255, 255)
-            Chams.Visible = true
 
             local HealthBar = Drawing.new("Square")
             HealthBar.Transparency = 1
